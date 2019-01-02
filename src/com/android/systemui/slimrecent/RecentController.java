@@ -405,7 +405,7 @@ public class RecentController implements RecentPanelView.OnExitListener,
         }
 
         VectorDrawable vd = (VectorDrawable)
-                mContext.getResources().getDrawable(R.drawable.ic_empty_recent);
+                mContext.getResources().getDrawable(R.drawable.ic_recent_keyguard);
         vd.setTint(getEmptyRecentColor());
         mEmptyRecentView.setImageDrawable(vd);
         int padding = mContext.getResources().getDimensionPixelSize(R.dimen.slim_recents_elevation);
