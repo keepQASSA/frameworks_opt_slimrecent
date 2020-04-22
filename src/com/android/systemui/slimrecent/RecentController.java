@@ -46,7 +46,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Color;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
@@ -172,8 +171,6 @@ public class RecentController implements RecentPanelView.OnExitListener,
     private boolean mMemBarLongClickToClear;
 
     private float mScaleFactor;
-
-    private boolean mAicpEmptyView;
 
     // Main panel view.
     private RecentPanelView mRecentPanelView;
@@ -407,30 +404,14 @@ public class RecentController implements RecentPanelView.OnExitListener,
             backgroundColor = mContext.getResources().getColor(R.color.recent_background);
         }
 
-        if (mAicpEmptyView) {
-            // AICP empty recents drawable
-            AnimatedVectorDrawable vd = (AnimatedVectorDrawable)
-                    mContext.getResources().getDrawable(R.drawable.aicp_no_recents_slim, null);
-            vd.setTint(tintColor);
-            mEmptyRecentView.setImageDrawable(vd);
-        } else {
-            // Default empty recents drawable
-            VectorDrawable vd = (VectorDrawable)
-                    mContext.getResources().getDrawable(R.drawable.ic_empty_recent);
-            vd.setTint(tintColor);
-            mEmptyRecentView.setImageDrawable(vd);
-        }
-
         VectorDrawable vd = (VectorDrawable)
-                mContext.getResources().getDrawable(R.drawable.ic_recent_keyguard);
-        vd.setTint(tintColor);
-        mKeyguardImage.setImageDrawable(vd);
-        mKeyguardText.setTextColor(tintColor);
-
+                mContext.getResources().getDrawable(R.drawable.ic_empty_recent);
+        vd.setTint(getEmptyRecentColor());
+        mEmptyRecentView.setImageDrawable(vd);
         int padding = mContext.getResources().getDimensionPixelSize(R.dimen.slim_recents_elevation);
         if (mMainGravity == Gravity.START) {
             mRecentContainer.setPadding(0, 0, padding, 0);
-            mEmptyRecentView.setRotation(mAicpEmptyView ? 0 : 180);
+            mEmptyRecentView.setRotation(180);
         } else {
             mRecentContainer.setPadding(padding, 0, 0, 0);
             mEmptyRecentView.setRotation(0);
@@ -449,9 +430,7 @@ public class RecentController implements RecentPanelView.OnExitListener,
     }
 
     private int getEmptyRecentColor() {
-        int color = mPanelColor == 0x00ffffff ?
-                mContext.getResources().getColor(R.color.recent_background) : mPanelColor;
-        if (Utilities.computeContrastBetweenColors(color,
+        if (Utilities.computeContrastBetweenColors(mPanelColor,
                 Color.WHITE) < 3f) {
             return mContext.getResources().getColor(
                     R.color.recents_empty_dark_color);
@@ -968,9 +947,6 @@ public class RecentController implements RecentPanelView.OnExitListener,
                     Settings.System.RECENT_PANEL_BG_COLOR),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SLIM_RECENT_AICP_EMPTY_DRAWABLE),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.USE_RECENT_APP_SIDEBAR),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -1049,10 +1025,6 @@ public class RecentController implements RecentPanelView.OnExitListener,
             mEnterExitAnimation = Settings.System.getIntForUser(
                     resolver, Settings.System.SLIM_RECENT_ENTER_EXIT_ANIMATION, 0,
                     UserHandle.USER_CURRENT);
-
-            mAicpEmptyView = Settings.System.getIntForUser(resolver,
-                    Settings.System.SLIM_RECENT_AICP_EMPTY_DRAWABLE, 1,
-                    UserHandle.USER_CURRENT) == 1;
 
             // Update colors in RecentPanelView
             mPanelColor = Settings.System.getIntForUser(resolver,
@@ -1295,7 +1267,7 @@ public class RecentController implements RecentPanelView.OnExitListener,
                 });
 
                 // Setup animation for empty recent image - fade in.
-                if (!hasFavorite && !mAicpEmptyView) {
+                if (!hasFavorite) {
                     mEmptyRecentView.setAlpha(0.0f);
                     mEmptyRecentView.setVisibility(View.VISIBLE);
                 }
@@ -1311,7 +1283,7 @@ public class RecentController implements RecentPanelView.OnExitListener,
                 // Start all ValueAnimator animations
                 // and listen onAnimationEnd to prepare the views for the next call.
                 AnimatorSet animationSet = new AnimatorSet();
-                if (hasFavorite || mAicpEmptyView) {
+                if (hasFavorite) {
                     animationSet.playTogether(animation1, animation3);
                 } else {
                     animationSet.playTogether(animation1, animation2, animation3, animation4);
