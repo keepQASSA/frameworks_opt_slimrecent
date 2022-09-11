@@ -48,10 +48,10 @@ import com.android.systemui.R;
 
 import java.util.ArrayList;
 
-import com.android.internal.util.pixeldust.slimrecents.Action;
-import com.android.internal.util.pixeldust.slimrecents.ActionConfig;
-import com.android.internal.util.pixeldust.slimrecents.ActionConstants;
-import com.android.internal.util.pixeldust.slimrecents.ActionHelper;
+import com.android.internal.util.qassa.slimrecents.Action;
+import com.android.internal.util.qassa.slimrecents.ActionConfig;
+import com.android.internal.util.qassa.slimrecents.ActionConstants;
+import com.android.internal.util.qassa.slimrecents.ActionHelper;
 
 public class AppSidebar extends FrameLayout {
     private static final String TAG = "SlimRecentAppSidebar";
